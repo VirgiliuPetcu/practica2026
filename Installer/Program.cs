@@ -29,7 +29,17 @@ namespace GSM_WOL_Installer
             project.ResolveWildCards();
             var exeFile = project.AllFiles.Single(f => f.Name.EndsWith("practica.exe"));
 
-            project.Version = new Version(FileVersionInfo.GetVersionInfo(exeFile.Name).ProductVersion);
+            string rawVersion = FileVersionInfo.GetVersionInfo(exeFile.Name).ProductVersion;
+            
+            string cleanVersion = rawVersion.Split('+')[0];
+
+           
+            if (!cleanVersion.Contains("."))
+            {
+                cleanVersion = "1.0.0.0";
+            }
+
+            project.Version = new Version(cleanVersion);
             project.Description = "WOL_GSM Windows Service";
            
             project.ControlPanelInfo.Manufacturer = "Petcu Virgiliu";

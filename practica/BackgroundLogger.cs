@@ -36,14 +36,27 @@ public class BackgroundLogger
     private string previousMsg;
     private readonly Task _backgroundTask;
     public bool fileExists;
+    public bool Empty;
 
-    public BackgroundLogger(string filePath)
+    public BackgroundLogger(string filePath="")
     {
-        _filePath = filePath;
-         _logChannel = Channel.CreateUnbounded<LogEvent>();
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            _filePath = (Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs.csv"));
+        }
+        else
+        {
+            _filePath = (Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filePath));
+        
+        }
+        _logChannel = Channel.CreateUnbounded<LogEvent>();
         previousMsg = string.Empty;
         _backgroundTask = Task.Run(ProcessLogQueueAsync);
         fileExists = File.Exists(_filePath);
+        if (!fileExists)
+        {
+            File.Create(_filePath).Close();  
+        }
 
     }
 
@@ -61,17 +74,20 @@ public class BackgroundLogger
 
     private async Task ProcessLogQueueAsync()
     {
-        
+
         using (StreamWriter writer = new StreamWriter(_filePath, append: true))
         {
             writer.AutoFlush = true;
-            using (CsvWriter csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture)) { 
+            
+            using (CsvWriter csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture)) {
                  
                 await foreach (LogEvent log in _logChannel.Reader.ReadAllAsync())
                 {
                     if (!fileExists) {
+                        
                         csvWriter.WriteHeader<LogEvent>();
                         await csvWriter.NextRecordAsync();
+                        fileExists = true;
                     }
                     csvWriter.WriteRecord(log);
                      await csvWriter.NextRecordAsync();
