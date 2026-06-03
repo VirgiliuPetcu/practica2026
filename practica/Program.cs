@@ -18,7 +18,7 @@ namespace Practica
                 .ConfigureServices(services =>
                 {
                
-                    services.AddSingleton(new BackgroundLogger("log.csv"));
+                    services.AddSingleton(new BackgroundLogger());
 
                   
                     services.AddSingleton<ModemManager>();

@@ -34,8 +34,10 @@ namespace practica.Config
                 }
                 else
                 {
+
                     Console.WriteLine($"Configuration file not found at {filePath}. Creating default configuration.");
                     ModemConfig defaultConfig = new ModemConfig();
+
                     SaveConfig(defaultConfig);
                     return defaultConfig;
                 }

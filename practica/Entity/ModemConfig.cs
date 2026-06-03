@@ -37,7 +37,6 @@ namespace practica.Entity
         [XmlElement("SecretMsg")]
         public string SecretMsg { get; set; } = "";
 
-        [XmlElement("LogFileName")]
-        public string LogFileName { get; set; } = "";
+        
     }
 }

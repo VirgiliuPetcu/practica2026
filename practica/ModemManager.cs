@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.IO.Ports;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
@@ -69,8 +70,8 @@ namespace practica
             Console.WriteLine($"CONFIG LOADED COM: {ModemConfiguration.ComPort} BAUDRATE: {ModemConfiguration.BaudRate} DEVICE NAME: {ModemConfiguration.DeviceName}");
 
             Console.WriteLine($"LOADING USER CONFIGURATION FROM {ModemConfiguration.UserConfigurationPath}");
-            string xmlStr = string.IsNullOrEmpty(ModemConfiguration.UserConfigurationPath) ? "Users.xml" : ModemConfiguration.UserConfigurationPath;
-            UserManager = new UsersConfiguration(xmlStr);
+           
+            UserManager = new UsersConfiguration(ModemConfiguration.UserConfigurationPath,logger);
             if (UserManager.isUserConfigurationLoaded)
             {
                 logger.Log(LOGINFO.INFO, $"USER CONFIGURATION LOADED SUCCESSFULLY ->{UserManager.UserCount} Users");
@@ -162,9 +163,11 @@ namespace practica
                 }
             }
 
-
-
-
+        }
+        public void SaveDataToFile()
+        {
+            UserManager.SaveUsersToFile();
+            ConfigManager.SaveConfig(ModemConfiguration);
 
 
         }
@@ -384,7 +387,7 @@ namespace practica
             return response.Status;
         }
 
-
+        
 
 
         public async Task<TerminalStatus> SetNetworkRegistration() {

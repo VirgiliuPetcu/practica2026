@@ -9,13 +9,22 @@ namespace practica.Config
 
 
         private List<User> users;
-
+        BackgroundLogger logger;
         private string XmlFileName;
-        public UsersConfiguration(string _pathToXML)
+        public UsersConfiguration(string _pathToXML,BackgroundLogger _logger)
         {
-            XmlFileName = _pathToXML;
 
-            users = GetUsersFromXML();
+            if (string.IsNullOrWhiteSpace(_pathToXML))
+            {
+                XmlFileName = (Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Users.xml"));
+            }
+            else { 
+                XmlFileName = (Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _pathToXML));
+            }
+
+
+                logger = _logger;
+                users = GetUsersFromXML();
 
         }
         public bool isUserConfigurationLoaded {
@@ -28,6 +37,8 @@ namespace practica.Config
                 return users != null ? users.Count : 0;
             }
         }   
+
+
 
 
 
@@ -63,7 +74,35 @@ namespace practica.Config
         }
 
 
-       
+        public  void SaveUsersToFile()
+        {
+
+            if (users != null && users.Count != 0)
+            {
+                return;
+            }
+            XmlSerializer writer = new XmlSerializer(typeof(List<User>));
+            try
+            {
+                using (FileStream fs = new FileStream(XmlFileName, FileMode.OpenOrCreate))
+                {
+                    writer.Serialize(fs, users);
+                }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                logger?.Log(LOGINFO.ERROR, $"Access to file {XmlFileName} denied: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                logger?.Log(LOGINFO.ERROR, $"Error saving users to {XmlFileName}: " + ex.Message);
+
+
+            }
+        }
+
+
+
         public  List<User> GetUsersFromXML()
         {
             XmlSerializer reader = new XmlSerializer(typeof(List<User>));
@@ -87,7 +126,7 @@ namespace practica.Config
             }
             catch (FileNotFoundException ex)
             {
-                Console.WriteLine($"File {XmlFileName} not found: " + ex.Message);
+                logger.Log(LOGINFO.ERROR, $"File {XmlFileName} not found: " + ex.Message);
                 XmlSerializer writer = new XmlSerializer(typeof(List<User>));
 
                 using (FileStream fs = new FileStream(XmlFileName, FileMode.Create)) {
@@ -99,9 +138,9 @@ namespace practica.Config
             }
             catch (UnauthorizedAccessException ex)
             {
-                Console.WriteLine($"Access to file {XmlFileName} denied: " + ex.Message);
+                logger.Log(LOGINFO.ERROR,$"Access to file {XmlFileName} denied: " + ex.Message);
             }
-            Console.WriteLine($"Error loading users from {XmlFileName}. Returning empty user list.");
+            logger.Log(LOGINFO.ERROR, $"Error loading users from {XmlFileName}. Returning empty user list.");
             return new List<User>();
         }
 

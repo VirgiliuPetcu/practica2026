@@ -26,6 +26,7 @@ namespace Practica
             stoppingToken.Register(async () =>
             {
                 Console.WriteLine("Service stopping: Writing to log before shutdown");
+                _modemManager.SaveDataToFile();
                 await _logger.ShutdownAsync();
             });
 
