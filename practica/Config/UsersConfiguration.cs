@@ -58,7 +58,7 @@ namespace practica.Config
 
         public string GetUserMacAdress(string number) {
 
-            if (users != null && users.Count > 0) { 
+            if (users != null || users?.Count > 0) { 
                 User found =  users.Find(usr => usr.Number == number);
                 if (found != null)
                 {

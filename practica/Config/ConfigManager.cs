@@ -1,4 +1,5 @@
-﻿using practica.Entity;
+﻿using Microsoft.Extensions.Logging;
+using practica.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +14,13 @@ namespace practica.Config
     public class ConfigManager
     {
 
-        public static readonly string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configuration.xml");
-        
+        public static string filePath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configuration.xml");
 
-        
+
         public static ModemConfig LoadConfig()
         {
-
-            Console.WriteLine(filePath);
+            
+           // Console.WriteLine(filePath);
             try
             {
                 if (File.Exists(filePath))
@@ -35,7 +35,7 @@ namespace practica.Config
                 else
                 {
 
-                    Console.WriteLine($"Configuration file not found at {filePath}. Creating default configuration.");
+                    //Console.WriteLine($"Configuration file not found at {filePath}. Creating default configuration.");
                     ModemConfig defaultConfig = new ModemConfig();
 
                     SaveConfig(defaultConfig);
@@ -44,7 +44,7 @@ namespace practica.Config
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading configuration: {ex.Message}");
+               //Console.WriteLine($"Error loading configuration: {ex.Message}");
                 return new ModemConfig(); // Return default config on error
             }
         }
